@@ -49,6 +49,13 @@ function addContact() {
 	console.log("Введіть email контакту: ");
 	const email = readlineSync.question().trim();
 
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	if (!emailRegex.test(email)) {
+		console.log("Некоректний формат email.");
+		readlineSync.question();
+		return;
+	}
+
 	contacts.push({ name, phone, email });
 }
 
@@ -142,48 +149,60 @@ function deleteContact() {
 
 	console.log("Введіть номер контакту для видалення: ");
 	const input = readlineSync.question("").trim();
-	const index = Number(input) - 1;
 
-	if (!Number.isInteger(index) || index < 0 || index >= contacts.length) {
+	const contactNumber = Number(input);
+
+	if (
+		input === "" ||
+		Number.isNaN(contactNumber) ||
+		contactNumber % 1 !== 0 ||
+		contactNumber < 1 ||
+		contactNumber > contacts.length
+	) {
 		console.log("Некоректний номер контакту.");
 		readlineSync.question();
 		return;
 	}
 
-	const removedList = contacts.splice(index, 1);
-	const removedContact = removedList[0];
+	const index = contactNumber - 1;
+	const removedContact = contacts.splice(index, 1);
 
-	console.log(`Контакт "${removedContact.name}" видалено.`);
+	console.log(`Контакт "${removedContact[0].name}" видалено.`);
 
 	readlineSync.question();
 }
 
 while (true) {
-	console.log("=== Адресна книга ===");
-	console.log(`* Кількість контактів (${contacts.length}) *`);
-	console.log("1 - Показати всі");
-	console.log("2 - Додати контакт");
-	console.log("3 - Фільтр");
-	console.log("4 - Сортування");
-	console.log("5 - Видалити");
-	console.log("0 - Вийти");
+	try {
+		console.log("=== Адресна книга ===");
+		console.log(`* Кількість контактів (${contacts.length}) *`);
+		console.log("1 - Показати всі");
+		console.log("2 - Додати контакт");
+		console.log("3 - Фільтр");
+		console.log("4 - Сортування");
+		console.log("5 - Видалити");
+		console.log("0 - Вийти");
 
-	let choice = readlineSync.question("> ").trim();
+		let choice = readlineSync.question("> ").trim();
 
-	if (choice === "0") {
-		break;
-	} else if (choice === "1") {
-		showAllContacts();
-	} else if (choice === "2") {
-		addContact();
-	} else if (choice === "3") {
-		filterContactsMenu();
-	} else if (choice === "4") {
-		sortMenu();
-	} else if (choice === "5") {
-		deleteContact();
-	} else {
-		console.log("Помилка.");
+		if (choice === "0") {
+			break;
+		} else if (choice === "1") {
+			showAllContacts();
+		} else if (choice === "2") {
+			addContact();
+		} else if (choice === "3") {
+			filterContactsMenu();
+		} else if (choice === "4") {
+			sortMenu();
+		} else if (choice === "5") {
+			deleteContact();
+		} else {
+			console.log("Помилка.");
+			readlineSync.question();
+		}
+	} catch (error) {
+		console.log("Сталася непередбачена помилка:", error.message);
 		readlineSync.question();
 	}
 }
